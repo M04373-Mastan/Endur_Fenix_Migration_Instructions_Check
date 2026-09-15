@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.endur.plugins.notification</groupId>
+    <artifactId>email-notification-plugin</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>Endur Email Notification Reusable Plug-in</name>
+    <description>
+        Reusable Email Notification component for OpenLink Endur / Findur.
+        Can be invoked as a generic Endur task/process plug-in, or called
+        directly (as a Java library) from any other Endur Java plug-in.
+    </description>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Point this at your local Endur installation lib directory -->
+        <endur.home>C:/Endur</endur.home>
+    </properties>
+
+    <dependencies>
+        <!--
+            Endur OpenComponents / OpenJVS SDK jars.
+            These are provided by the Endur installation itself and are NOT
+            redistributable, so they are referenced as "system" scope.
+            Update the systemPath values to match your Endur install, or
+            better, install them into your local/corporate Maven repo and
+            switch these to normal <scope>provided</scope> dependencies.
+        -->
+        <dependency>
+            <groupId>com.olf</groupId>
+            <artifactId>openrisk-api</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${endur.home}/lib/openrisk-api.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.olf</groupId>
+            <artifactId>embedded-api</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${endur.home}/lib/embedded-api.jar</systemPath>
+        </dependency>
+
+        <!-- SMTP / MIME email support (JavaMail) -->
+        <dependency>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>jakarta.mail</artifactId>
+            <version>1.6.7</version>
+        </dependency>
+
+        <!-- Logging facade -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.36</version>
+        </dependency>
+
+        <!-- Testing -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>email-notification-plugin</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Bundle jakarta.mail + slf4j into the deployable jar,
+                                 excluding the Endur SDK jars which already exist at runtime -->
+                            <artifactSet>
+                                <excludes>
+                                    <exclude>com.olf:*</exclude>
+                                </excludes>
+                            </artifactSet>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
